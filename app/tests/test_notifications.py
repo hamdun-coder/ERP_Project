@@ -1,22 +1,19 @@
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
-from app.db.database import SessionLocal
+import pytest
+
 from app.models.user import User
 from app.models.intervention import Intervention
 from app.models.notification import Notification
 from app.core.security import get_password_hash
 
-client = TestClient(app)
 
-@pytest.fixture(scope="module")
-def db():
-    db = SessionLocal()
-    yield db
-    db.close()
+@pytest.fixture()
+def db(db_session):
+    """Utilise la session de base de données de test partagée."""
+    yield db_session
 
-@pytest.fixture(scope="module")
-def notif_user_and_token(db):
+@pytest.fixture()
+def notif_user_and_token(client, db):
     """Crée un utilisateur et retourne header JWT"""
     user = User(
         username="notifuser",
@@ -54,7 +51,7 @@ def created_intervention(db):
     db.delete(intervention)
     db.commit()
 
-def test_create_notification(notif_user_and_token, created_intervention):
+def test_create_notification(client, notif_user_and_token, created_intervention):
     """Création d'une notification liée à une intervention"""
     headers, user = notif_user_and_token
     response = client.post(
@@ -77,7 +74,8 @@ def test_create_notification(notif_user_and_token, created_intervention):
     # Nettoyage
     client.delete(f"/api/v1/notifications/{data['id']}", headers=headers)
 
-def test_get_user_notifications(notif_user_and_token, created_intervention):
+
+def test_get_user_notifications(client, notif_user_and_token, created_intervention):
     """Récupère les notifications utilisateur"""
     headers, user = notif_user_and_token
 
@@ -105,7 +103,8 @@ def test_get_user_notifications(notif_user_and_token, created_intervention):
     # Nettoyage
     client.delete(f"/api/v1/notifications/{notif_id}", headers=headers)
 
-def test_get_user_notifications_empty(notif_user_and_token, db):
+
+def test_get_user_notifications_empty(client, notif_user_and_token, db):
     """Retourne une liste vide si l’utilisateur n’a aucune notification"""
     headers, user = notif_user_and_token
 

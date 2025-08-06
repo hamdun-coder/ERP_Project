@@ -128,10 +128,11 @@ class Intervention(Base):
     __table_args__ = (
         Index('idx_intervention_statut_priorite', 'statut', 'priorite'),
         Index('idx_intervention_technicien_statut', 'technicien_id', 'statut'),
-        Index('idx_intervention_equipement_type', 'equipement_id', 'type_intervention'),
+        # Attention : la colonne est stockée sous le nom "type" en base
+        Index('idx_intervention_equipement_type', 'equipement_id', 'type'),
         Index('idx_intervention_client_statut', 'client_id', 'statut'),
         Index('idx_intervention_dates', 'date_creation', 'date_limite'),
-        Index('idx_intervention_type_urgence', 'type_intervention', 'urgence'),
+        Index('idx_intervention_type_urgence', 'type', 'urgence'),
     )
 
     # Clé primaire
@@ -222,11 +223,11 @@ class Intervention(Base):
     
     # Relations de traçabilité (1:N) - lazy dynamic pour volumes
     documents = relationship(
-        "Document", 
-        back_populates="intervention", 
+        "Document",
+        back_populates="intervention",
         cascade="all, delete-orphan",
         lazy="dynamic",
-        order_by="desc(Document.uploaded_at)"
+        order_by="desc(Document.date_upload)"
     )
     
     historiques = relationship(
@@ -238,11 +239,11 @@ class Intervention(Base):
     )
     
     notifications = relationship(
-        "Notification", 
-        back_populates="intervention", 
+        "Notification",
+        back_populates="intervention",
         cascade="all, delete-orphan",
         lazy="dynamic",
-        order_by="desc(Notification.created_at)"
+        order_by="desc(Notification.date_envoi)"
     )
     
     # Relations stock et consommables (1:N)
