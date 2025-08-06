@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from .planning import Planning
     from .client import Client
     from .contrat import Contrat
+    from .intervention_equipement import InterventionEquipement
 
 
 class StatutEquipement(str, enum.Enum):
@@ -164,11 +165,18 @@ class Equipement(Base):
     )
     
     plannings = relationship(
-        "Planning", 
-        back_populates="equipement", 
+        "Planning",
+        back_populates="equipement",
         cascade="all, delete-orphan",
         lazy="dynamic",
-        order_by="Planning.date_prevue"
+        order_by="Planning.prochaine_date"
+    )
+
+    interventions_assoc = relationship(
+        "InterventionEquipement",
+        back_populates="equipement",
+        cascade="all, delete-orphan",
+        lazy="dynamic",
     )
 
     def __repr__(self) -> str:
@@ -385,7 +393,7 @@ class Equipement(Base):
     def get_planning_maintenance(self) -> List["Planning"]:
         """Retourne les maintenances planifiées à venir."""
         return list(self.plannings.filter(
-            Planning.date_prevue >= datetime.utcnow()
+            Planning.prochaine_date >= datetime.utcnow()
         ).all())
 
     def peut_etre_supprime(self) -> bool:

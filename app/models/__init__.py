@@ -50,11 +50,12 @@ from .equipement import (
 
 # Modèles interventions - cœur métier
 from .intervention import (
-    Intervention, 
-    InterventionType, 
+    Intervention,
+    InterventionType,
     StatutIntervention,
     PrioriteIntervention
 )
+from .intervention_equipement import InterventionEquipement
 
 # Modèles planification et organisation
 from .planning import Planning
@@ -67,6 +68,7 @@ from .notification import Notification
 
 # Modèles audit et traçabilité
 from .historique import HistoriqueIntervention
+from .audit import Audit
 
 # Modèles contractuels et commerciaux
 from .contrat import Contrat, Facture, TypeContrat, StatutContrat
@@ -105,6 +107,7 @@ __all__ = [
     
     # Interventions - métier principal
     "Intervention", "InterventionType", "StatutIntervention", "PrioriteIntervention",
+    "InterventionEquipement",
     
     # Organisation et planification
     "Planning",
@@ -116,7 +119,7 @@ __all__ = [
     "Notification", 
     
     # Audit et traçabilité
-    "HistoriqueIntervention",
+    "HistoriqueIntervention", "Audit",
     
     # Commercial et contrats
     "Contrat", "Facture", "TypeContrat", "StatutContrat",

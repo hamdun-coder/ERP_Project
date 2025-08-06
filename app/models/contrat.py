@@ -113,6 +113,13 @@ class Contrat(Base):
         lazy="dynamic"
     )
 
+    equipements = relationship(
+        "Equipement",
+        back_populates="contrat",
+        cascade="all, delete-orphan",
+        lazy="dynamic"
+    )
+
     def __repr__(self) -> str:
         return f"<Contrat(id={self.id}, numero='{self.numero_contrat}', client='{self.client_id}')>"
 

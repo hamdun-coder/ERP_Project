@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from .notification import Notification
     from .historique import HistoriqueIntervention
     from .stock import MouvementStock
+    from .audit import Audit
 
 
 class UserRole(str, enum.Enum):
@@ -127,27 +128,35 @@ class User(Base):
     
     # Relations de traçabilité (1:N) - lazy dynamic pour performances
     notifications = relationship(
-        "Notification", 
-        back_populates="user", 
+        "Notification",
+        back_populates="user",
         cascade="all, delete-orphan",
         lazy="dynamic",
-        order_by="desc(Notification.created_at)"
+        order_by="desc(Notification.date_envoi)"
     )
     
     historiques = relationship(
-        "HistoriqueIntervention", 
-        back_populates="user", 
+        "HistoriqueIntervention",
+        back_populates="user",
         cascade="all, delete-orphan",
         lazy="dynamic",
         order_by="desc(HistoriqueIntervention.horodatage)"
     )
-    
+
     mouvements_stock = relationship(
-        "MouvementStock", 
-        back_populates="user", 
+        "MouvementStock",
+        back_populates="user",
         cascade="all, delete-orphan",
         lazy="dynamic",
         order_by="desc(MouvementStock.date_mouvement)"
+    )
+
+    audits = relationship(
+        "Audit",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="dynamic",
+        order_by="desc(Audit.created_at)"
     )
 
     def __repr__(self) -> str:

@@ -6,6 +6,7 @@ from app.core.config import settings
 
 # Initialisation de Base
 Base = declarative_base()
+Base.__allow_unmapped__ = True  # SQLAlchemy 2.x compat: allow legacy type hints
 
 # Production engine par défaut
 DATABASE_URL = (
