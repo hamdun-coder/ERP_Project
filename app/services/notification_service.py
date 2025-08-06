@@ -3,6 +3,8 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from datetime import datetime
+from typing import List
+
 from app.models.notification import Notification
 from app.schemas.notification import NotificationCreate
 from app.models.user import User
@@ -48,6 +50,28 @@ def create_notification(db: Session, data: NotificationCreate) -> Notification:
         send_email_notification(user.email, notif)
 
     return notif
+
+
+def get_notifications_by_user(db: Session, user_id: int) -> List[Notification]:
+    """Retourne toutes les notifications d'un utilisateur."""
+    return db.query(Notification).filter(Notification.user_id == user_id).all()
+
+
+def delete_notification(db: Session, notification_id: int) -> None:
+    """Supprime une notification existante.
+
+    Args:
+        db: Session de base de données.
+        notification_id: identifiant de la notification à supprimer.
+
+    Raises:
+        HTTPException: si la notification n'existe pas.
+    """
+    notif = db.query(Notification).filter(Notification.id == notification_id).first()
+    if not notif:
+        raise HTTPException(status_code=404, detail="Notification introuvable")
+    db.delete(notif)
+    db.commit()
 
 
 def send_email_notification(email_to: str, notification: Notification):

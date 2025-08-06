@@ -127,11 +127,11 @@ class User(Base):
     
     # Relations de traçabilité (1:N) - lazy dynamic pour performances
     notifications = relationship(
-        "Notification", 
-        back_populates="user", 
+        "Notification",
+        back_populates="user",
         cascade="all, delete-orphan",
         lazy="dynamic",
-        order_by="desc(Notification.created_at)"
+        order_by="desc(Notification.date_envoi)"
     )
     
     historiques = relationship(

@@ -149,9 +149,8 @@ class Equipement(Base):
     )
     
     contrat: Optional["Contrat"] = relationship(
-        "Contrat", 
-        back_populates="equipements",
-        lazy="select"
+        "Contrat",
+        lazy="select",
     )
     
     # Relations de maintenance (1:N) - lazy dynamic pour performances
@@ -164,11 +163,11 @@ class Equipement(Base):
     )
     
     plannings = relationship(
-        "Planning", 
-        back_populates="equipement", 
+        "Planning",
+        back_populates="equipement",
         cascade="all, delete-orphan",
         lazy="dynamic",
-        order_by="Planning.date_prevue"
+        order_by="Planning.prochaine_date"
     )
 
     def __repr__(self) -> str:

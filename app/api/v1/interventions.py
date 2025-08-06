@@ -3,18 +3,20 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.db.database import SessionLocal
 from app.schemas.intervention import InterventionCreate, InterventionOut, StatutIntervention
+from app.schemas.historique import HistoriqueOut
 from app.services.intervention_service import (
     create_intervention,
     get_intervention_by_id,
     get_all_interventions,
-    update_statut_intervention
+    update_statut_intervention,
 )
+from app.services.historique_service import list_historique_by_intervention
 from app.core.rbac import get_current_user, technicien_required, responsable_required
 
 router = APIRouter(
-    prefix="/api/v1/interventions",
+    prefix="/interventions",
     tags=["interventions"],
-    responses={404: {"description": "Intervention non trouvée"}}
+    responses={404: {"description": "Intervention non trouvée"}},
 )
 
 def get_db():
@@ -78,3 +80,17 @@ def change_statut_intervention(
         user_id=int(user["user_id"]),
         remarque=remarque
     )
+
+
+@router.get(
+    "/{intervention_id}/historique",
+    response_model=List[HistoriqueOut],
+    summary="Historique d'une intervention",
+    description="Retourne la liste des événements enregistrés pour l'intervention donnée.",
+)
+def get_historique_intervention(
+    intervention_id: int,
+    db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user),
+):
+    return list_historique_by_intervention(db, intervention_id)

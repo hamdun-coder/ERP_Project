@@ -3,11 +3,16 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
+
 from app.db.database import SessionLocal
 from app.schemas.notification import NotificationCreate, NotificationOut
-from app.services.notification_service import create_notification
+from app.services.notification_service import (
+    create_notification,
+    get_notifications_by_user,
+    delete_notification,
+)
 from app.models.notification import Notification
-from app.core.rbac import responsable_required, admin_required
+from app.core.rbac import responsable_required
 
 router = APIRouter(
     prefix="/notifications",
@@ -42,3 +47,26 @@ def create_new_notification(data: NotificationCreate, db: Session = Depends(get_
 )
 def list_notifications(db: Session = Depends(get_db)):
     return db.query(Notification).all()
+
+
+@router.get(
+    "/user/{user_id}",
+    response_model=List[NotificationOut],
+    summary="Notifications d'un utilisateur",
+    description="Retourne toutes les notifications associées à un utilisateur donné.",
+    dependencies=[Depends(responsable_required)],
+)
+def list_user_notifications(user_id: int, db: Session = Depends(get_db)):
+    return get_notifications_by_user(db, user_id)
+
+
+@router.delete(
+    "/{notification_id}",
+    status_code=204,
+    summary="Supprimer une notification",
+    description="Supprime définitivement une notification (admin/responsable uniquement).",
+    dependencies=[Depends(responsable_required)],
+)
+def remove_notification(notification_id: int, db: Session = Depends(get_db)):
+    delete_notification(db, notification_id)
+    return None

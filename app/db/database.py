@@ -5,7 +5,12 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings
 
 # Initialisation de Base
+# ``__allow_unmapped__`` est activé pour éviter les erreurs d'annotations
+# non typées avec SQLAlchemy 2 lors des tests. Les modèles existants utilisent
+# encore la syntaxe déclarative classique sans les génériques ``Mapped[]`` ;
+# cette option permet de conserver ces modèles tels quels pour l'instant.
 Base = declarative_base()
+Base.__allow_unmapped__ = True
 
 # Production engine par défaut
 DATABASE_URL = (
